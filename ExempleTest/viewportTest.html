@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        svg {
+            display: block;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Function to create a square/rectangle canvas in the middle of the screen
+        function createCenteredCanvas() {
+            // Get the dimensions of the viewport
+            var viewportWidth = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+            var viewportHeight = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+
+            // Calculate the size of the canvas (75% of the minimum dimension)
+            var canvasSize = 0.75 * Math.min(viewportWidth, viewportHeight);
+
+            // Create an SVG element
+            var svg = d3.select("body").append("svg")
+                .attr("width", canvasSize)
+                .attr("height", canvasSize);
+
+            // Append a rectangle to the SVG
+            svg.append("rect")
+                .attr("width", canvasSize)
+                .attr("height", canvasSize)
+                .attr("fill", "lightblue");
+        }
+
+        // Call the function to create the centered canvas
+        createCenteredCanvas();
+    </script>
+</body>
+</html>
