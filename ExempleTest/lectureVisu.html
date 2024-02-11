@@ -30,7 +30,7 @@
 
         const width = 700;
         const height = 600;
-        const sizeCircleEnd = 7;
+        const sizeCircleEnd = 8;
         const x1 = sizeCircleEnd + 1;
         const x2 = width - 100 - sizeCircleEnd - 1;
 
@@ -248,7 +248,7 @@
                 .on("mouseover", function() { // Event listener for mouseover
                     d3.select(this)
                         .transition()
-                        .duration(200)
+                        .duration(20)
                         .attr("r", 15) // Increase circle radius
                         .attr("opacity", 1)
                         .attr("stroke-width", 2);
@@ -271,7 +271,7 @@
                 .on("mouseout", function() { // Event listener for mouseout
                         d3.select(this)
                             .transition()
-                            .duration(200)
+                            .duration(20)
                             .attr("opacity", 0.6)
                             .attr("stroke-width", 0.5);
 
@@ -281,7 +281,7 @@
                         const name = d3.select(this).datum().name;
                         svg.selectAll("circle")
                                 .filter(d => d.nameFam === name)
-                            .attr("opacity", 0.3)
+                            .attr("opacity", 0.5)
                 })
                 .transition()
                 .duration(8000)
@@ -315,9 +315,11 @@
                     .ease(d3.easeCircleOut) // Circle out ease
                 //  .attr("cy", (d, i) => (((height - 20) - ((groupIndex) * ((height - 40) / familleOlfac.length))) + d.randomPos - (((height - 40) / familleOlfac.length) / 2)))
                     .attr("cy", (d, i) => (height - (familleOlfac.length - 1 - groupIndex)*(height/familleOlfac.length) - (10 + sizeCircleEnd/2) + d.randomPos))
-                    .attr("opacity", 0.3)
-                    .attr("fill", d => d.color)
+                    .attr("opacity", 0.5)   
                     .attr("r", sizeCircleEnd)
+                    .transition()
+                    .duration(300)
+                    .attr("fill", d => d.color)
                     .on("end", function() { // Event listener for transition end
                         // Attach mouseover and mouseout events after transition is complete
                         d3.select(this)
@@ -343,7 +345,7 @@
                         .transition()
                         .duration(200)
                         .attr("r", sizeCircleEnd) // Restore circle radius
-                        .attr("opacity", 0.3); // Restore opacity
+                        .attr("opacity", 0.5); // Restore opacity
 
                     // Remove popup text
                     svg.selectAll(".popup").remove();
