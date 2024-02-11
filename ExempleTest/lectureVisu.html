@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3.js CSV to JSON</title>
+    <!-- Include D3.js library -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        svg {
+            border: 1px solid #ccc;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <script>
+
+        const width = 700;
+        const height = 600;
+        const sizeCircleEnd = 7;
+        const x1 = sizeCircleEnd + 1;
+        const x2 = width - 100 - sizeCircleEnd - 1;
+
+        const svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        const familleOlfac = [
+        {
+        name : "Orangé aldéhydé",
+        color : "#FFF1C5",
+        children : []
+        },
+        {
+        name : "Citralé",
+        color : "#FFE47A",
+        children : []
+        },
+        {
+        name : "Zesté",
+        color : "#e2ed40",
+        children : []
+        },
+        {
+        name : "Agreste",
+        color : "#E7BD3D",
+        children : []
+        },
+        {
+        name : "Anisé",
+        color : "#BAB465",
+        children : []
+        },
+        {
+        name : "Menthé",
+        color : "#AED99C",
+        children : []
+        },
+        {
+        name : "Vert",
+        color : "#92E46D",
+        children : []
+        },
+        {
+        name : "Soufré",
+        color : "#FFD966",
+        children : []
+        },
+        {
+        name : "Fruité",
+        color : "#a90d0d",
+        children : []
+        },
+        {
+        name : "Marin",
+        color : "#6fa8dc",
+        children : []
+        },
+        {
+        name : "Florale fraîche",
+        color : "#D7FAD8",
+        children : []
+        },
+        {
+        name : "Fleur d'oranger",
+        color : "#fcfbcf",
+        children : []
+        },
+        {
+        name : "Rosé",
+        color : "#FFBEDE",
+        children : []
+        },
+        {
+        name : "Epicé",
+        color : "#B64F4F",
+        children : []
+        },
+        {
+        name : "Conifère terpénique",
+        color : "#c25f4f",
+        children : []
+        },
+        {
+        name : "Boisé",
+        color : "#C27D4F",
+        children : []
+        },
+
+        {
+        name : "Mousse moisi",
+        color : "#c4aa81",
+        children : []
+        },
+        {
+        name : "Miellé",
+        color : "#D7B13D",
+        children : []
+        },
+        {
+        name : "Coumariné foin",
+        color : "#F2CD62",
+        children : []
+        },
+        {
+        name : "Balsamique",
+        color : "#FFEAAA",
+        children : []
+        },
+        {
+        name : "Ambré",
+        color : "#E4A461",
+        children : []
+        },
+        {
+        name : "Pyrogéné cuir",
+        color : "#9C6A1C",
+        children : []
+        },
+        {
+        name : "Animal",
+        color : "#73400C",
+        children : []
+        },
+        {
+        name : "Musqué",
+        color : "#54310C",
+        children : []
+        },
+        ]
+
+
+
+        d3.dsv(";","./olfaction.csv").then(function(data) {
+
+            data.forEach( function(d,i) {
+                const contains = familleOlfac.find(famille => famille.name === d.b);
+
+                if(contains) {
+                    contains.children.push(
+                        {
+                            name : d.a,
+                            desc : d.c,
+                            posX : 0,
+                            groupNumber : familleOlfac.indexOf(contains),
+                            color : contains.color,
+                            nameFam : contains.name,
+                            randomPos: 0 // Math.random() * sizeCircleEnd
+                        }
+
+                    );
+                }
+            })
+
+            let scale = d3.scaleLinear().range([x1, x2]);
+
+            familleOlfac.forEach( function(d,i) {
+
+                const sizeChild = d.children.length;
+                scale.domain([0, sizeChild]);
+
+                d.children.forEach( function(child,index) {
+                    child.posX = (scale(index) + scale(index +1)) / 2.0;
+                })
+            })
+
+            const objectsData = familleOlfac.map(obj => obj.children).flat().sort(() => Math.random() - 0.5);
+
+            console.log(objectsData);
+
+            const rectanglesData = d3.range(familleOlfac.length).map((d, i) => ({
+                x: 600,
+                y: height - (i+1)*(height/familleOlfac.length),
+                width: 100,
+                height: height/familleOlfac.length,
+                fill: familleOlfac[familleOlfac.length - 1 - i].color, 
+                name : familleOlfac[familleOlfac.length - 1 - i].name,
+                stroke: "black",
+                strokeWidth: 0.5,
+                class: "rectangleFam"
+            }));
+
+
+            d3.range(familleOlfac.length).map((d, i) => (
+                svg .append("rect")
+                .attr("x", 0)
+                .attr("y", height - (i+1)*(height/familleOlfac.length))
+                .attr("width", 600)
+                .attr("height",height/familleOlfac.length)
+                .attr("fill", "white")
+                .attr("stroke", "white")
+                .attr("opacity", 0.1)
+                .attr("stroke-width", 0.5))
+                .transition()
+                .duration(8000)
+                .attr("fill", familleOlfac[familleOlfac.length - 1 - i].color)
+                .attr("stroke", "black")
+                
+            );
+
+            svg.selectAll(".rectangleFam")
+                .data(rectanglesData)
+                .enter()
+                .append("rect")
+                .attr("class", d => d.class)
+                .attr("x", d => d.x)
+                .attr("y", d => d.y)
+                .attr("width", d => d.width)
+                .attr("height", d => d.height)
+                .attr("fill", "white")
+                .attr("stroke", "black")
+                .attr("opacity", 0.0)
+                .attr("stroke-width", 0.5)
+                .on("mouseover", function() { // Event listener for mouseover
+                    d3.select(this)
+                        .transition()
+                        .duration(200)
+                        .attr("r", 15) // Increase circle radius
+                        .attr("opacity", 1)
+                        .attr("stroke-width", 2);
+
+                    // Show popup text
+                    const name = d3.select(this).datum().name;
+                    svg.append("text")
+                        .attr("class", "popup")
+                        .attr("x", +d3.select(this).attr("x") + 50)
+                        .attr("y", +d3.select(this).attr("y") + height/(familleOlfac.length*2))
+                        .attr("text-anchor", "middle")
+                        .attr("font-size", "12px")
+                        .style("pointer-events", "none")
+                        .text(name);
+
+                        svg.selectAll("circle")
+                            .filter(d => d.nameFam === name)
+                            .attr("opacity", 1)
+                })
+                .on("mouseout", function() { // Event listener for mouseout
+                        d3.select(this)
+                            .transition()
+                            .duration(200)
+                            .attr("opacity", 0.6)
+                            .attr("stroke-width", 0.5);
+
+                        // Remove popup text
+                        svg.selectAll(".popup").remove();
+
+                        const name = d3.select(this).datum().name;
+                        svg.selectAll("circle")
+                                .filter(d => d.nameFam === name)
+                            .attr("opacity", 0.3)
+                })
+                .transition()
+                .duration(8000)
+                .attr("fill", d => d.fill)
+                .attr("stroke", d => d.stroke)
+                .attr("opacity", 0.4)
+
+                        // Append circles representing objects to the SVG
+            const circles = svg.selectAll("circle")
+                .data(objectsData) // Bind data to circles
+                .enter() // Enter selection for new circles
+                .append("circle")
+                .attr("cx", (d) => d.posX) 
+                .attr("cy", height) 
+                .attr("r", 0.1)
+                .attr("fill", "white") 
+                .attr("stroke", "black") 
+                .attr("stroke-width", 0.5)
+                .attr("opacity", 0.1) ;           
+            
+
+            // Transition function for objects
+            function transitionObjects(groupIndex) {
+                // Select circles for the current group
+                const groupCircles = circles.filter(d => d.groupNumber === groupIndex);
+
+                const delay = 3000.0/(groupCircles.size());
+                groupCircles.transition().delay((d, i) => (i * delay)).attr("opacity", 0.7).transition()
+                // .delay((d, i) => (i * 300 )) // Delay based on index (i) of the circle within the group
+                    .duration(5000) // Transition duration in milliseconds
+                    .ease(d3.easeCircleOut) // Circle out ease
+                //  .attr("cy", (d, i) => (((height - 20) - ((groupIndex) * ((height - 40) / familleOlfac.length))) + d.randomPos - (((height - 40) / familleOlfac.length) / 2)))
+                    .attr("cy", (d, i) => (height - (familleOlfac.length - 1 - groupIndex)*(height/familleOlfac.length) - (10 + sizeCircleEnd/2) + d.randomPos))
+                    .attr("opacity", 0.3)
+                    .attr("fill", d => d.color)
+                    .attr("r", sizeCircleEnd)
+                    .on("end", function() { // Event listener for transition end
+                        // Attach mouseover and mouseout events after transition is complete
+                        d3.select(this)
+                    .on("mouseover", function() { // Event listener for mouseover
+                    d3.select(this)
+                        .transition()
+                        .duration(200)
+                        .attr("r", sizeCircleEnd + 4) // Increase circle radius
+                        .attr("opacity", 1); // Increase opacity
+
+                    // Show popup text
+                    const itemNumber = d3.select(this).datum().name ;
+                    svg.append("text")
+                        .attr("class", "popup")
+                        .attr("x", +d3.select(this).attr("cx"))
+                        .attr("y", +d3.select(this).attr("cy") + 25)
+                        .attr("text-anchor", "middle")
+                        .attr("font-size", "12px")
+                        .text(`${itemNumber}`);
+                })
+                .on("mouseout", function() { // Event listener for mouseout
+                    d3.select(this)
+                        .transition()
+                        .duration(200)
+                        .attr("r", sizeCircleEnd) // Restore circle radius
+                        .attr("opacity", 0.3); // Restore opacity
+
+                    // Remove popup text
+                    svg.selectAll(".popup").remove();
+                })
+                    });
+            }
+
+            // Trigger transitions for each group of circles
+            for (let i = 0; i < familleOlfac.length; i++) {
+                transitionObjects(i);
+            }
+
+        
+			console.log(familleOlfac);
+          //  console.log(JSON.stringify(result, null, 2));
+        }).catch(function(error) {
+            console.log("Error loading the CSV file: " + error);
+        });
+    </script>
+</body>
+</html>
