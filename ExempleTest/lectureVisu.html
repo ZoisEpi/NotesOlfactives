@@ -30,6 +30,7 @@
 
         const width = 700;
         const height = 600;
+        const heightE = 600; 
         const sizeCircleEnd = 8;
         const x1 = sizeCircleEnd + 1;
         const x2 = width - 100 - sizeCircleEnd - 1;
@@ -116,6 +117,11 @@
         children : []
         },
         {
+        name : "Balsamique",
+        color : "#FFEAAA",
+        children : []
+        },
+        {
         name : "Conifère terpénique",
         color : "#c25f4f",
         children : []
@@ -133,11 +139,6 @@
         {
         name : "Coumariné foin",
         color : "#F2CD62",
-        children : []
-        },
-        {
-        name : "Balsamique",
-        color : "#FFEAAA",
         children : []
         },
         {
@@ -186,14 +187,27 @@
             })
 
             let scale = d3.scaleLinear().range([x1, x2]);
+            const maxChildren = familleOlfac.reduce((max, obj) => Math.max(max, obj.children.length), 0);
+
+            scale.domain([0, maxChildren]);
+
+            const midpoint = (x1 + x2)/2.0;
+            const separation =  scale(1) - scale(0);
+
+            console.log(separation);
 
             familleOlfac.forEach( function(d,i) {
 
                 const sizeChild = d.children.length;
+
+                const range = separation * (sizeChild - 1);
+                const startPosition = midpoint - range / 2;
+
                 scale.domain([0, sizeChild]);
 
                 d.children.forEach( function(child,index) {
-                    child.posX = (scale(index) + scale(index +1)) / 2.0;
+                    child.posX = startPosition + index * separation
+                 //   child.posX = (scale(index) + scale(index +1)) / 2.0;
                 })
             })
 
@@ -203,7 +217,7 @@
 
             const rectanglesData = d3.range(familleOlfac.length).map((d, i) => ({
                 x: 600,
-                y: height - (i+1)*(height/familleOlfac.length),
+                y: heightE - (i+1)*(height/familleOlfac.length),
                 width: 100,
                 height: height/familleOlfac.length,
                 fill: familleOlfac[familleOlfac.length - 1 - i].color, 
@@ -216,20 +230,22 @@
 
             d3.range(familleOlfac.length).map((d, i) => (
                 svg .append("rect")
-                .attr("x", 0)
-                .attr("y", height - (i+1)*(height/familleOlfac.length))
-                .attr("width", 600)
+                .attr("x", familleOlfac[familleOlfac.length - 1 - i].children[0].posX - 2*sizeCircleEnd)  
+                .attr("y", heightE - (i+1)*(height/familleOlfac.length))
+                .attr("width", familleOlfac[familleOlfac.length - 1 - i].children[familleOlfac[familleOlfac.length - 1 - i].children.length - 1].posX - 
+                familleOlfac[familleOlfac.length - 1 - i].children[0].posX + 4*sizeCircleEnd) 
                 .attr("height",height/familleOlfac.length)
                 .attr("fill", "white")
                 .attr("stroke", "white")
-                .attr("opacity", 0.1)
-                .attr("stroke-width", 0.5))
+                .attr("fill-opacity", 0.1)
+                .attr("stroke-width", 0.5)
                 .transition()
                 .duration(8000)
                 .attr("fill", familleOlfac[familleOlfac.length - 1 - i].color)
                 .attr("stroke", "black")
+                .attr("stroke-opacity", 0.7)
                 
-            );
+            ));
 
             svg.selectAll(".rectangleFam")
                 .data(rectanglesData)
@@ -313,7 +329,7 @@
                     .duration(5000) // Transition duration in milliseconds
                     .ease(d3.easeCircleOut) // Circle out ease
                 //  .attr("cy", (d, i) => (((height - 20) - ((groupIndex) * ((height - 40) / familleOlfac.length))) + d.randomPos - (((height - 40) / familleOlfac.length) / 2)))
-                    .attr("cy", (d, i) => (height - (familleOlfac.length - 1 - groupIndex)*(height/familleOlfac.length) - (10 + sizeCircleEnd/2) + d.randomPos))
+                    .attr("cy", (d, i) => (height - (familleOlfac.length - 1 - groupIndex)*(height/familleOlfac.length) - (sizeCircleEnd + sizeCircleEnd/2) + d.randomPos))
                     .attr("opacity", 0.5)   
                     .attr("r", sizeCircleEnd)
                     .transition()
